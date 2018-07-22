@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="cn.ttms.dao.TicketMapper">
+  	<resultMap type="cn.ttms.pojo.Ticket" id="ticketAll">
+  		<id column="t_ticket_id" property="ticket_id"/>
+  		<result column="t_sched_id" property="sched_id"/>
+  		<result column="t_seat_id" property="seat_id"/>
+  		<result column="t_ticket_locket_time" property="ticket_locked_time"/>
+  		<result column="t_ticket_price" property="ticket_price"/>
+  		<result column="t_ticket_status" property="ticket_status"/>
+  		<association property="seat" javaType="cn.ttms.pojo.Seat">
+  			<id column="s_seat_id" property="seat_id"/>
+  			<result column="s_seat_row" property="seat_row"/>
+  			<result column="s_seat_column" property="seat_column"/>
+  			<result column="s_seat_status" property="seat_status"/>
+  		</association>
+  		<association property="schedule" javaType="cn.ttms.pojo.Schedule">
+  			<id column="sc_sched_id" property="sched_id"/>
+  			<result column="sc_sched_time" property="sched_time"/>
+  			<result column="sc_play_id" property="play_id"/>
+  			<association property="play" javaType="cn.ttms.pojo.Play">
+  				<id column="p_play_id" property="play_id"/>
+  				<result column="p_play_image" property="play_image"/>
+  				<result column="p_play_name" property="play_name"/>
+  			</association>
+  			<association property="studio" javaType="cn.ttms.pojo.Studio">
+  				<id column="st_studio_id" property="studio_id"/>
+  				<result column="st_studio_name" property="studio_name"/>
+  				<result column="st_studio_row_count" property="studio_row_count"/>
+  				<result column="st_studio_col_count" property="studio_col_count"/>
+  				<result column="st_studio_introduction" property="studio_introduction"/>
+  				<result column="st_studio_flag" property="studio_flag"/>
+  			</association>
+  		</association>
+  	</resultMap>
+
+  	<select id="queryTicketAllBySchedId" parameterType="int"
+  			resultMap="ticketAll">
+  		select
+		t.ticket_id as t_ticket_id,
+		t.sched_id as t_sched_id,
+		t.seat_id as t_seat_id,
+		t.ticket_locked_time as t_ticket_locket_time,
+		t.ticket_price as t_ticket_price,
+		t.ticket_status as t_ticket_status,
+		s.seat_id as s_seat_id,
+		s.seat_row as s_seat_row,
+		s.seat_column as s_seat_column,
+		s.seat_status as s_seat_status,
+		sc.play_id as sc_play_id,
+		sc.sched_id as sc_sched_id,
+		sc.sched_time as sc_sched_time,
+		p.play_id as p_play_id,
+		p.play_image as p_play_image,
+		p.play_name as p_play_name,
+		st.studio_id as st_studio_id,
+		st.studio_name as st_studio_name,
+		st.studio_row_count as st_studio_row_count,
+		st.studio_col_count as st_studio_col_count,
+		st.studio_introduction as st_studio_introduction,
+		st.studio_flag as st_studio_flag
+		from ticket t
+		join seat s on t.seat_id = s.seat_id
+		join `schedule` sc on t.sched_id = sc.sched_id
+		join play p on sc.play_id = p.play_id
+		join studio st on sc.studio_id = st.studio_id
+		where sc.sched_id = #{id}	
+  	</select>
+  	<select id="queryTicketBySchedId" parameterType="int"
+  			resultType="cn.ttms.pojo.Ticket">
+  		select * from ticket where sched_id = #{id}
+  	</select>
+  	<select id="queryTicketIdByVo" parameterType="cn.ttms.pojo.QueryVo"
+  			resultType="int">
+  		SELECT
+		t.ticket_id
+		from ticket as t
+		join seat as s on t.seat_id = s.seat_id
+		where s.seat_row = #{seat_row} 
+		and s.seat_column =#{seat_col} 
+		and t.sched_id= #{schedid}
+  	</select>
+  	<select id="detailTicketById" parameterType="int"
+  			resultType="cn.ttms.pojo.Ticket">
+  		select * from ticket where ticket_id = #{id}
+  	</select>
+  	<select id="queryTicketStatus" parameterType="int"
+  			resultType="int">
+  		select ticket_status from ticket where ticket_id = #{id}
+  	</select>
+  	<resultMap type="cn.ttms.pojo.Ticket" id="resultTimes">
+  		<id column="t_ticket_id" property="ticket_id"/>
+  		<result column="t_ticket_price" property="ticket_price"/>
+  		<result column="t_ticket_status" property="ticket_status"/>
+  		<association property="seat" javaType="cn.ttms.pojo.Seat">
+  			<result column="s_seat_status" property="seat_status"/>
+  		</association>
+  		<association property="schedule" javaType="cn.ttms.pojo.Schedule">
+  			<result column="sc_sched_time" property="sched_time"/>
+  			<association property="play" javaType="cn.ttms.pojo.Play">
+  				<result column="p_play_name" property="play_name"/>
+  			</association>
+  			<association property="studio" javaType="cn.ttms.pojo.Studio">
+  				<result column="st_studio_name" property="studio_name"/>
+  				<result column="st_studio_flag" property="studio_flag"/>
+  			</association>
+  		</association>
+  	</resultMap>
+  	<select id="queryTicketAllByTicketId" parameterType="int"
+  			resultMap="resultTimes">
+  		select
+		t.ticket_id as t_ticket_id,
+		t.ticket_price as t_ticket_price,
+		t.ticket_status as t_ticket_status,
+		s.seat_status as s_seat_status,
+		sc.sched_time as sc_sched_time,
+		p.play_name as p_play_name,
+		st.studio_name as st_studio_name,
+		st.studio_flag as st_studio_flag
+		from ticket t
+		join seat s on t.seat_id = s.seat_id
+		join `schedule` sc on t.sched_id = sc.sched_id
+		join play p on sc.play_id = p.play_id
+		join studio st on sc.studio_id = st.studio_id
+		where t.ticket_id = #{ticket_id}
+  	</select>
+  	
+  	<update id="updateTicketById" parameterType="cn.ttms.pojo.Ticket">
+  		UPDATE ticket 
+  		SET ticket_status = #{ticket_status} 
+  		WHERE ticket_id = #{ticket_id}
+	</update>
+	<update id="updateticketlockedtime" parameterType="cn.ttms.pojo.Ticket">
+  		UPDATE ticket 
+  		SET ticket_locked_time = #{ticket_locked_time}, ticket_status = #{ticket_status}
+  		WHERE ticket_id = #{ticket_id}
+	</update>
+	<delete id="deleteTicketBySchedid" parameterType="int">
+		delete from ticket where sched_id = #{id}
+	</delete>
+ 	<insert id="insertTicket" parameterType="cn.ttms.pojo.Ticket">
+			insert into Ticket
+				<trim prefix="(" suffix=")" suffixOverrides=",">
+					ticket_id,
+					<if test=" seat_id !=null and seat_id !=''">
+						seat_id,
+					</if>
+					<if test=" sched_id !=null and sched_id !=''">
+						sched_id,
+					</if>
+					<if test=" ticket_price !=null and ticket_price !=''">
+						ticket_price,
+					</if>
+						ticket_status,
+				</trim>
+				<trim prefix="values (" suffix=")" suffixOverrides=",">
+					null,
+					<if test=" seat_id !=null and seat_id !=''">
+						#{seat_id},
+					</if>
+					<if test=" sched_id !=null and sched_id !=''">
+						#{sched_id},
+					</if>
+					<if test=" ticket_price !=null and ticket_price !=''">
+						#{ticket_price},
+					</if>
+						#{ticket_status},
+			</trim>
+	</insert>
+	
+  </mapper>

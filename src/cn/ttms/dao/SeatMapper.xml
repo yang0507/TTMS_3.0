@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="cn.ttms.dao.SeatMapper">
+  	<resultMap type="cn.ttms.pojo.Seat" id="seatJoinTick">
+  		<id column="seat_id" property="seat_id"/>
+  		<result column="studio_id" property="studio_id"/>
+  		<result column="seat_row" property="seat_row"/>
+  		<result column="seat_column" property="seat_column"/>
+  		<result column="seat_status" property="seat_status"/>
+  		<association property="ticket" javaType="cn.ttms.pojo.Ticket">
+  			<id column="ticket_id" property="ticket_id"/>
+  			<result column="t_seat_id" property="seat_id"/>
+  			<result column="sched_id" property="sched_id"/>
+  			<result column="ticket_price" property="ticket_price"/>
+  			<result column="ticket_status" property="ticket_status"/>
+  			<result column="ticket_locked_time" property="ticket_locked_time"/>
+  		</association>
+  	</resultMap>
+  	<select id="querySeatByStudioId" parameterType="int"
+  			resultType="cn.ttms.pojo.Seat">
+  		select * from seat where studio_id = #{id}
+  	</select>
+  	
+  	<select id="detailSeatById" parameterType="int"
+  			resultType="cn.ttms.pojo.Seat">
+  		select * from seat where seat_id = #{id}
+  	</select>
+  	
+  	<select id="seatJoinTickBySchedId" parameterType="int"
+  			resultMap="seatJoinTick">
+  		SELECT
+		s.seat_id,
+		s.studio_id,
+		s.seat_row,
+		s.seat_column,
+		s.seat_status,
+		t.ticket_id,
+		t.seat_id as t_seat_id,
+		t.sched_id,
+		t.ticket_price,
+		t.ticket_status,
+		t.ticket_locked_time
+		from seat as s
+		join ticket as t on s.seat_id = t.seat_id
+		where t.sched_id = #{id}
+  	</select>
+  	<select id="seatJoinTickByVo" parameterType="cn.ttms.pojo.QueryVo"
+  			resultMap="seatJoinTick">
+  		SELECT
+		s.seat_id,
+		s.studio_id,
+		s.seat_row,
+		s.seat_column,
+		s.seat_status,
+		t.ticket_id,
+		t.seat_id as t_seat_id,
+		t.sched_id,
+		t.ticket_price,
+		t.ticket_status,
+		t.ticket_locked_time
+		from seat as s
+		join ticket as t on s.seat_id = t.seat_id
+		where t.sched_id = #{schedid} and s.seat_row= #{seat_row} and s.seat_column= #{seat_col}  	
+	</select>
+  	<update id="updateseatById" parameterType="cn.ttms.pojo.Seat">
+  		UPDATE seat 
+  		SET seat_status = #{seat_status} 
+  		WHERE seat_id = #{seat_id}
+	</update>
+	<delete id="deleteseatByStudioId" parameterType="int">
+		delete from seat where studio_id = #{id}
+	</delete>
+ 	<insert id="insertseat" parameterType="cn.ttms.pojo.Seat">
+			insert into seat
+				<trim prefix="(" suffix=")" suffixOverrides=",">
+					seat_id,
+					<if test=" studio_id !=null and studio_id !=''">
+						studio_id,
+					</if>
+					<if test=" seat_row !=null and seat_row !=''">
+						seat_row,
+					</if>
+					<if test=" seat_column !=null and seat_column !=''">
+						seat_column,
+					</if>
+					<if test=" seat_status !=null and seat_status !=''">
+						seat_status,
+					</if>
+				</trim>
+				<trim prefix="values (" suffix=")" suffixOverrides=",">
+					null,
+					<if test=" studio_id !=null and studio_id !=''">
+						#{studio_id},
+					</if>
+					<if test=" seat_row !=null and seat_row !=''">
+						#{seat_row},
+					</if>
+					<if test=" seat_column !=null and seat_column !=''">
+						#{seat_column},
+					</if>
+					<if test=" seat_status !=null and seat_status !=''">
+						#{seat_status},
+					</if>
+			</trim>
+	</insert>
+	
+  </mapper>

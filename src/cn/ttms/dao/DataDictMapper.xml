@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="cn.ttms.dao.DataDictMapper">
+  	<sql id="where_dict">
+  		<where>
+  			<if test="dataDictName !=null and dataDictName !='' ">
+  				and dict_name like '%${dataDictName}%'
+  			</if>
+  			<if test="dataDictParentId !=null and dataDictParentId !=''">
+  				and dict_parent_id = #{dataDictParentId}
+  			</if>
+  			and dict_parent_id =2 or dict_parent_id=3
+  		</where>
+  	</sql>
+  	<select id="queryDictByCode" parameterType="string" 
+  			resultType="cn.ttms.pojo.DataDict">
+  		SELECT * FROM data_dict WHERE dict_parent_id = #{code}
+  	</select>
+  	<select id="queryDictAll"  parameterType="cn.ttms.pojo.QueryVo"
+  			resultType="cn.ttms.pojo.DataDict">
+  		select * from data_dict
+  		<include refid="where_dict"/>
+  		limit #{start},#{size}
+  	</select>
+  	<select id="queryDictAllCount" parameterType="cn.ttms.pojo.QueryVo"
+  			resultType="int" >
+  		select count(*) 
+  		from data_dict
+  		<include refid="where_dict"/>
+  	</select>
+  	<select id="detaildictById" parameterType="int" 
+  			resultType="cn.ttms.pojo.DataDict">
+  		SELECT * FROM data_dict WHERE dict_id = #{id}		
+  	</select>
+  	<delete id="deletedictById" parameterType="int">
+  		delete from data_dict where dict_id = #{id}
+  	</delete>
+  	<insert id="insertdict" parameterType="cn.ttms.pojo.DataDict">
+  		insert into data_dict
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+				dict_id,
+				<if test=" dict_parent_id !=null and dict_parent_id !=''">
+					dict_parent_id,
+				</if>
+				<if test=" dict_index !=null and dict_index !=''">
+					dict_index,
+				</if>
+				<if test=" dict_name !=null and dict_name !=''">
+					dict_name,
+				</if>
+				<if test=" dict_value !=null and dict_value !=''">
+					dict_value,
+				</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+				null,
+				<if test=" dict_parent_id !=null and dict_parent_id !=''">
+					#{dict_parent_id},
+				</if>
+				<if test=" dict_index !=null and dict_index !=''">
+					#{dict_index},
+				</if>
+				<if test=" dict_name !=null and dict_name !=''">
+					#{dict_name},
+				</if>
+				<if test=" dict_value !=null and dict_value !=''">
+					#{dict_value},
+				</if>
+		</trim>
+  	</insert>
+  	<update id="updatedict" parameterType="cn.ttms.pojo.DataDict">
+  		update data_dict
+  		<set>
+ 			<if test=" dict_parent_id !=null and dict_parent_id !=''">
+				dict_parent_id = #{dict_parent_id},
+			</if>
+			<if test=" dict_index !=null and dict_index !=''">
+				dict_index = #{dict_index},
+			</if>
+			<if test=" dict_name !=null and dict_name !=''">
+				dict_name = #{dict_name},
+			</if>
+			<if test=" dict_value !=null and dict_value !=''">
+				dict_value = #{dict_value},
+			</if>
+  		</set>
+  		where dict_id = #{dict_id}
+  	</update>
+  </mapper>

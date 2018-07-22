@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="cn.ttms.dao.PlayMapper">
+  	<sql id="play_where">
+  		<where>
+			<if test=" playName!= null and  playName!=''">
+				and  play_name like '%${playName}%'
+			</if>
+			<if test=" playLong!= null and  playLong!=''">
+				and  play_lang_id =#{playLong}
+			</if>
+			<if test=" playType!= null and  playType!=''">
+				and  play_type_id =#{playType}
+			</if>
+  		</where>
+  	</sql>
+  	<select id="queryPlayByVo" parameterType="cn.ttms.pojo.QueryVo"
+  			resultType="cn.ttms.pojo.Play">
+  		select * 
+  		from play
+		<include refid="play_where"/>
+		limit #{start},#{size}
+  	</select>
+	<select id="queryPlayByStatus" resultType="cn.ttms.pojo.Play">
+		select * 
+		from play
+		where play_status = 1 or play_status = 0
+  	</select>
+  	<select id="queryPlayByVoCount" parameterType="cn.ttms.pojo.QueryVo"
+  			resultType="int">
+  		select count(*) 
+  		from play
+		<include refid="play_where"/>
+  	</select>
+  	
+  	<select id="queryPlayById" parameterType="int" 
+  			resultType="cn.ttms.pojo.Play">
+  		select * from play where play_id =#{id}
+  	</select>
+  	
+  	<insert id="insertPlay" parameterType="cn.ttms.pojo.Play">
+  		insert into play
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+				play_id,
+			<if test=" play_type_id !=null and play_type_id !=''">
+				play_type_id,
+			</if>
+			<if test=" play_lang_id !=null and play_lang_id !=''">
+				play_lang_id,
+			</if>
+			<if test=" play_name !=null and play_name !=''">
+				play_name,
+			</if>
+			<if test=" play_introduction !=null and play_introduction !=''">
+				play_introduction,
+			</if>
+			<if test=" play_length !=null and play_length !=''">
+				play_length,
+			</if>
+			<if test=" play_ticket_price !=null and play_ticket_price !=''">
+				play_ticket_price,
+			</if>
+			<if test=" play_status !=null and play_status !=''">
+				play_status,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+				null,
+			<if test=" play_type_id !=null and play_type_id !=''">
+				#{play_type_id},
+			</if>
+			<if test=" play_lang_id !=null and play_lang_id !=''">
+				#{play_lang_id},
+			</if>
+			<if test=" play_name !=null and play_name !=''">
+				#{play_name},
+			</if>
+			<if test=" play_introduction !=null and play_introduction !=''">
+				#{play_introduction},
+			</if>
+			<if test=" play_length !=null and play_length !=''">
+				#{play_length},
+			</if>
+			<if test=" play_ticket_price !=null and play_ticket_price !=''">
+				#{play_ticket_price},
+			</if>
+			<if test=" play_status !=null and play_status !=''">
+				#{play_status},
+			</if>
+		</trim>
+  	</insert>
+  	
+  	<delete id="deletePlayById" parameterType="int">
+  		delete from play where play_id=#{id}
+  	</delete>
+  	
+  	<update id="updatePlayById" parameterType="cn.ttms.pojo.Play">
+  		update play
+  		<set>
+			<if test=" play_type_id !=null and play_type_id !=''">
+				play_type_id = #{play_type_id},
+			</if>
+			<if test=" play_lang_id !=null and play_lang_id !=''">
+				play_lang_id = #{play_lang_id},
+			</if>
+			<if test=" play_name !=null and play_name !=''">
+				play_name = #{play_name},
+			</if>
+			<if test=" play_introduction !=null and play_introduction !=''">
+				play_introduction = #{play_introduction},
+			</if>
+			<if test=" play_length !=null and play_length !=''">
+				play_length = #{play_length},
+			</if>
+			<if test=" play_ticket_price !=null and play_ticket_price !=''">
+				play_ticket_price = #{play_ticket_price},
+			</if>
+			<if test=" play_status !=null and play_status !=''">
+				play_status = #{play_status},
+			</if>
+  		</set>
+		where play_id = #{play_id}
+  	</update>
+  	<update id="updatePlayImgById" parameterType="cn.ttms.pojo.Play">
+  		update play
+		set play_image = #{play_image}
+		where play_id = #{play_id}
+  	</update>
+  	<update id="statusPlayById" parameterType="int">
+  		update play
+  		<set>
+				play_status = 1,
+  		</set>
+		where play_id = #{id}
+  	</update>
+  	
+  	<update id="outstatusPlayById" parameterType="int">
+  		update play
+  		<set>
+				play_status = -1,
+  		</set>
+		where play_id = #{id}
+  	</update>
+  </mapper>

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="cn.ttms.dao.LoginMapper">
+  
+  	<resultMap type="cn.ttms.pojo.User" id="resultUser">
+		<id column="u_emp_no" property="emp_no"/>
+		<result column="u_emp_pass" property="emp_pass"/>
+		<result column="u_type" property="type"/>
+		<result column="u_status" property="status"/>
+		<association property="employee" javaType="cn.ttms.pojo.Employee">
+			<id column="e_emp_id" property="emp_id"/>
+			<result column="e_emp_no" property="emp_no"/>
+			<result column="e_emp_name" property="emp_name"/>
+			<result column="e_emp_tel_num" property="emp_tel_num"/>
+			<result column="e_emp_addr" property="emp_addr"/>
+			<result column="e_emp_email" property="emp_email"/>
+		</association>
+	</resultMap>
+  	<select id="checkStatus" parameterType="cn.ttms.pojo.User"
+  			resultType="int">
+  			<!-- 检查用户是否激活 -->
+  		select u.`status` from `user` as u  where u.emp_no = #{emp_no}
+  	</select>
+  	
+  	<select id="checktype"  parameterType="cn.ttms.pojo.User"
+  			resultType="int">
+  			<!-- 检查用户身份 -->
+  		select u.type from `user` as u  where u.emp_no = #{emp_no}
+  	</select>
+  	
+  	<select id="checklogin" parameterType="cn.ttms.pojo.User"
+  			resultMap="resultUser">
+  			<!-- 检查登录 -->
+  		select 
+		u.emp_no as u_emp_no,
+		u.emp_pass as u_emp_pass,
+		u.type as u_type,
+		u.`status` as u_status,
+		e.emp_id as e_emp_id,
+		e.emp_no as e_emp_no,
+		e.emp_name as e_emp_name,
+		e.emp_tel_num as e_emp_tel_num,
+		e.emp_addr as e_emp_addr,
+		e.emp_email as e_emp_email
+		from `user` as u  
+		join employee e on u.emp_no = e.emp_no
+		where u.emp_no = #{emp_no} and u.emp_pass = #{emp_pass}
+  	</select>
+  	
+  	<select id="CheckactivationCode" parameterType="cn.ttms.pojo.User"
+  			resultType="String">
+  			<!-- 查询激活码 -->
+  		select u.activation_code from `user` as u where u.emp_no = #{emp_no}
+  	</select>
+  	
+  	<select id="checkstatusByNo" parameterType="String"
+  			resultType="int">
+  			<!-- 查询是否激活 -->
+  		select u.status from `user` as u where u.emp_no = #{no}
+  	</select>
+  	<update id="activateuser" parameterType="cn.ttms.pojo.User">
+  		<!-- 用户激活 -->
+  		UPDATE `user` 
+  		SET `status` = 1 
+  		where emp_no = #{emp_no} and activation_code = #{activation_code}
+  	</update>
+  	
+  	
+  </mapper>

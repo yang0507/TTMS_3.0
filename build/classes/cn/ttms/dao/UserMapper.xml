@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="cn.ttms.dao.UserMapper">
+  		<sql id="user_where">
+	  		<where>
+	  			<if test="empName !=null and empName !=''">
+	  				and e.emp_name like '%${empName}%'
+	  			</if>
+	  			<if test="empTelNum !=null and empTelNum !=''">
+	  				and e.emp_tel_num = #{empTelNum}
+	  			</if>
+	  		</where>
+  		</sql>
+  		
+  		<resultMap type="cn.ttms.pojo.User" id="resultUser">
+  			<id column="u_emp_no" property="emp_no"/>
+  			<result column="u_emp_pass" property="emp_pass"/>
+  			<result column="u_type" property="type"/>
+  			<result column="u_status" property="status"/>
+  			<association property="employee" javaType="cn.ttms.pojo.Employee">
+  				<id column="e_emp_id" property="emp_id"/>
+  				<result column="e_emp_no" property="emp_no"/>
+  				<result column="e_emp_name" property="emp_name"/>
+  				<result column="e_emp_tel_num" property="emp_tel_num"/>
+  				<result column="e_emp_addr" property="emp_addr"/>
+  				<result column="e_emp_email" property="emp_email"/>
+  			</association>
+  		</resultMap>
+  		
+  		<select id="queryuserByVo" parameterType="cn.ttms.pojo.QueryVo"
+  				resultMap="resultUser">
+  			select 
+			u.emp_no as u_emp_no,
+			u.emp_pass as u_emp_pass,
+			u.type as u_type,
+			u.`status` as u_status,
+			e.emp_id as e_emp_id,
+			e.emp_no as e_emp_no,
+			e.emp_name as e_emp_name,
+			e.emp_tel_num as e_emp_tel_num,
+			e.emp_addr as e_emp_addr,
+			e.emp_email as e_emp_email
+			from user as u 
+			join employee e on u.emp_no = e.emp_no
+  			<include refid="user_where"/>
+  			limit #{start},#{size}
+  		</select>
+  		
+  		<select id="queryuserByVoCount" parameterType="cn.ttms.pojo.QueryVo"
+  				resultType="int">
+  			select count(*)
+			from user as u 
+			join employee e on u.emp_no = e.emp_no
+  			<include refid="user_where"/>
+  		</select>
+  		
+  		<select id="queryuserByNo" parameterType="String"
+  				resultType="cn.ttms.pojo.User">
+  			select 
+			* 
+			from user where emp_no = #{no}
+  		</select>
+  		
+  		<update id="updateuserByNo" parameterType="cn.ttms.pojo.User">
+			UPDATE user SET type = #{type} WHERE emp_no = #{emp_no}
+  		</update>
+  		
+  		<update id="updatePassByVo" parameterType="cn.ttms.pojo.User">
+			UPDATE user SET emp_pass = #{emp_pass} WHERE emp_no = #{emp_no}
+  		</update>
+  		
+  		<update id="activationUser" parameterType="cn.ttms.pojo.User">
+  			UPDATE user SET `status` = 1 WHERE emp_no = #{emp_no} and activation_code = #{activation_code}
+  		</update>
+  		<delete id="deleteuserByNo" parameterType="String">
+  			delete from user where emp_no = #{no}
+  		</delete>
+  		
+  		<insert id="insertuser" parameterType="cn.ttms.pojo.User">
+  			insert into user
+  			<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test=" emp_no !=null and emp_no !=''">
+				emp_no,
+			</if>
+			<if test="emp_pass !=null and emp_pass !=''">
+				emp_pass,
+			</if>
+			<if test=" type !=null and type !=''">
+				type,
+			</if>
+				status,
+			<if test="activation_code !=null and activation_code!=''">
+				activation_code,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<!-- 注册时初始密码是编号 默认状态为0 未激活 -->
+			<if test=" emp_no !=null and emp_no !=''">
+				#{emp_no},
+			</if>
+			<if test="emp_pass !=null and emp_pass !=''">
+				#{emp_pass},
+			</if>
+			<if test=" type !=null and type !=''">
+				#{type},
+			</if>
+				0,
+			<if test="activation_code !=null and activation_code!=''">
+				#{activation_code},
+			</if>
+		</trim>
+  		</insert>
+  </mapper>

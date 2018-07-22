@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="cn.ttms.dao.ScheduleMapper">
+  		<sql id="schedule_where">
+	  		<where>
+	  			<if test=" st_name !=null and st_name !=''">
+					st.studio_name like "%" #{st_name} "%"
+	  			</if>
+	  			<if test=" p_name !=null and p_name !=''">
+	  				and p.play_name like "%" #{p_name} "%"
+	  			</if>
+	  		</where>
+  		</sql>
+  		<resultMap type="cn.ttms.pojo.Schedule" id="scheduResult">
+  			<id column="sc_sched_id" property="sched_id"/>
+  			<result column="sc_studio_id" property="studio_id"/>
+  			<result column="sc_play_id" property="play_id"/>
+  			<result column="sc_sched_time" property="sched_time"/>
+  			<result column="sc_sched_ticket_price" property="sched_ticket_price"/>
+  			<result column="sc_sched_status" property="sched_status"/>
+  			<association property="studio" javaType="cn.ttms.pojo.Studio">
+  				<id column="st_studio_id" property="studio_id"/>
+  				<result column="st_studio_name" property="studio_name"/>	
+  			</association>
+  			<association property="play"  javaType="cn.ttms.pojo.Play">
+  				<id column="p_play_id" property="play_id"/>
+  				<result column="p_play_name" property="play_name"/>	
+  				<result column="p_play_image" property="play_image"/>
+  				<result column="p_play_ticket_price" property="play_ticket_price"/>	
+  				<result column="p_play_status" property="play_status"/>	
+  			</association>
+  		</resultMap>
+  		<resultMap type="cn.ttms.pojo.Schedule" id="scheduleAll">
+  			<id column="sc_sched_id" property="sched_id"/>
+  			<result column="sc_studio_id" property="studio_id"/>
+  			<result column="sc_play_id" property="play_id"/>
+  			<result column="sc_sched_time" property="sched_time"/>
+  			<result column="sc_sched_ticket_price" property="sched_ticket_price"/>
+  			<result column="sc_sched_status" property="sched_status"/>
+  			<association property="studio" javaType="cn.ttms.pojo.Studio">
+  				<id column="st_studio_id" property="studio_id"/>
+  				<result column="st_studio_name" property="studio_name"/>
+  				<result column="st_studio_col_count" property="studio_col_count"/>
+  				<result column="st_studio_row_count" property="studio_row_count"/>
+  			</association>
+  			<association property="play"  javaType="cn.ttms.pojo.Play">
+  				<id column="p_play_id" property="play_id"/>
+  				<result column="p_play_name" property="play_name"/>	
+  				<result column="p_play_image" property="play_image"/>
+  				<result column="p_play_ticket_price" property="play_ticket_price"/>
+  				<result column="p_play_length" property="play_length"/>
+  				<result column="p_play_introduction" property="play_introduction"/>
+  			</association>
+  		</resultMap>
+  		<select id="queryscheduleByVo" parameterType="cn.ttms.pojo.QueryVo"
+  				resultMap="scheduResult" >
+  			SELECT 
+			sc.sched_id as sc_sched_id,
+			sc.studio_id as sc_studio_id,
+			sc.play_id as sc_play_id,
+			sc.sched_time as sc_sched_time,
+			sc.sched_ticket_price as sc_sched_ticket_price,
+			sc.sched_status as sc_sched_status,
+			st.studio_id as st_studio_id,
+			st.studio_name as st_studio_name,
+			p.play_id as p_play_id,
+			p.play_name as p_play_name,
+			p.play_image as p_play_image,
+			p.play_ticket_price as p_play_ticket_price,
+			p.play_status as p_play_status
+			FROM `schedule` as sc 
+			JOIN studio as st ON sc.studio_id = st.studio_id
+			JOIN play as p ON sc.play_id = p.play_id
+  			<include refid="schedule_where"/>
+  			limit #{start},#{size}
+  		</select>
+
+  	    <select id="queryScheduleForSell" resultMap="scheduResult" >
+  			SELECT 
+			sc.sched_id as sc_sched_id,
+			sc.studio_id as sc_studio_id,
+			sc.play_id as sc_play_id,
+			sc.sched_time as sc_sched_time,
+			sc.sched_ticket_price as sc_sched_ticket_price,
+			sc.sched_status as sc_sched_status,
+			st.studio_id as st_studio_id,
+			st.studio_name as st_studio_name,
+			p.play_id as p_play_id,
+			p.play_name as p_play_name,
+			p.play_image as p_play_image,
+			p.play_ticket_price as p_play_ticket_price,
+			p.play_status as p_play_status
+			FROM `schedule` as sc 
+			JOIN studio as st ON sc.studio_id = st.studio_id
+			JOIN play as p ON sc.play_id = p.play_id
+  		</select>
+  		
+  		<select id="queryscheduleByVoCount" parameterType="cn.ttms.pojo.QueryVo"
+  				resultType="int">
+  			SELECT 
+			count(*)
+			FROM `schedule` as sc 
+			JOIN studio as st ON sc.studio_id = st.studio_id
+			JOIN play as p ON sc.play_id = p.play_id
+  			<include refid="schedule_where"/>
+  		</select>
+  		
+  		<select id="queruscheduleById" parameterType="int"
+  				resultType="cn.ttms.pojo.Schedule" >
+			select * from schedule where sched_id = #{id}
+  		</select>
+  		
+  		<select id="queryscheduleAllById" parameterType="int"
+  				resultMap="scheduleAll">
+  			SELECT 
+			sc.sched_id as sc_sched_id,
+			sc.studio_id as sc_studio_id,
+			sc.play_id as sc_play_id,
+			sc.sched_time as sc_sched_time,
+			sc.sched_ticket_price as sc_sched_ticket_price,
+			sc.sched_status as sc_sched_status,
+			st.studio_id as st_studio_id,
+			st.studio_name as st_studio_name,
+			st.studio_col_count as st_studio_col_count,
+			st.studio_row_count as st_studio_row_count,
+			p.play_id as p_play_id,
+			p.play_name as p_play_name,
+			p.play_image as p_play_image,
+			p.play_ticket_price as p_play_ticket_price,
+			p.play_length as p_play_length,
+			p.play_introduction as p_play_introduction
+			FROM `schedule` as sc
+			JOIN studio as st ON sc.studio_id = st.studio_id
+			JOIN play as p ON sc.play_id = p.play_id
+			where sc.sched_id = #{id}
+  		</select>
+  		<update id="updatescheduleById" parameterType="cn.ttms.pojo.Schedule">
+  			update schedule      
+  			<set>
+  				<if test=" studio_id != null and studio_id !='' ">
+  					studio_id = #{studio_id},
+  				</if>
+  				<if test=" play_id != null and play_id !='' ">
+  					play_id = #{play_id},
+  				</if>
+  				<if test=" sched_time !=null and sched_time !=''">
+					sched_time = #{sched_time},
+				</if>
+  				<if test=" sched_ticket_price != null and sched_ticket_price !='' ">
+  					sched_ticket_price = #{sched_ticket_price},
+  				</if>
+  			</set>
+  			where sched_id = #{sched_id}
+  		</update>
+  		<update id="updatestatusSchedule" parameterType="int">
+			update `schedule` 
+			set sched_status = 1
+  			where sched_id = #{id}
+  		</update>
+  		<delete id="deletescheduleById" parameterType="int">
+  			delete from schedule where sched_id = #{id}
+  		</delete>
+  		
+  		<insert id="insertschedule" parameterType="cn.ttms.pojo.Schedule">
+  			insert into schedule
+  			<trim prefix="(" suffix=")" suffixOverrides=",">
+				sched_id,
+			<if test=" studio_id !=null and studio_id !=''">
+				studio_id,
+			</if>
+			<if test=" play_id !=null and play_id !=''">
+				play_id,
+			</if>
+			<if test=" sched_time !=null and sched_time !=''">
+				sched_time,
+			</if>
+			<if test=" sched_ticket_price !=null and sched_ticket_price !=''">
+				sched_ticket_price,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+				null,
+			<if test=" studio_id !=null and studio_id !=''">
+				#{studio_id},
+			</if>
+			<if test=" play_id !=null and play_id !=''">
+				#{play_id},
+			</if>
+			<if test=" sched_time !=null and sched_time !=''">
+				#{sched_time},
+			</if>
+			<if test=" sched_ticket_price !=null and sched_ticket_price !=''">
+				#{sched_ticket_price},
+			</if>
+		</trim>
+  		</insert>
+  </mapper>

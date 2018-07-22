@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="cn.ttms.dao.EmployeeMapper">
+  		<sql id="employee_where">
+	  		<where>
+	  			<if test="empName !=null and empName !=''">
+	  				and e.emp_name like '%${empName}%'
+	  			</if>
+	  			<if test="empTelNum !=null and empTelNum !=''">
+	  				and e.emp_tel_num= #{empTelNum}
+	  			</if>
+	  		</where>
+  		</sql>
+  		
+  		<select id="queryEmployeeByVo" parameterType="cn.ttms.pojo.QueryVo"
+  				resultType="cn.ttms.pojo.Employee" >
+  			select * 
+  			from employee as e 
+  			<include refid="employee_where"/>
+  			limit #{start},#{size}
+  		</select>
+  		
+  		<select id="queryEmployeeByVoCount" parameterType="cn.ttms.pojo.QueryVo"
+  				resultType="int">
+  			select count(*) 
+  			from employee as e 
+  			<include refid="employee_where"/>
+  		</select>
+  		
+  		<select id="queruEmployeeById" parameterType="int"
+  				resultType="cn.ttms.pojo.Employee">
+  			select * from employee where emp_id = #{id}
+  		</select>
+  		
+  		<select id="queruEmployeeAll" resultType="cn.ttms.pojo.Employee">
+  			select * from employee
+  		</select>
+  		
+  		<select id="queryemailByNo" parameterType="String"
+  				resultType="String">
+  			select 
+  			emp_email 
+  			from employee where emp_no = #{no}
+  		</select>
+  		<update id="updateEmployeeById" parameterType="cn.ttms.pojo.Employee">
+  			update employee      
+  			<set>
+  				<if test=" emp_no!= null and emp_no!='' ">
+  					emp_no = #{emp_no},
+  				</if>
+  				<if test=" emp_name!= null and emp_name!='' ">
+  					emp_name = #{emp_name},
+  				</if>
+  				<if test=" emp_tel_num!= null and emp_tel_num!='' ">
+  					emp_tel_num = #{emp_tel_num},
+  				</if>
+  				<if test=" emp_addr!= null and emp_addr!='' ">
+  					emp_addr = #{emp_addr},
+  				</if>
+  				<if test=" emp_email!= null and emp_email!='' ">
+  					emp_email = #{emp_email},
+  				</if>
+  			</set>
+  			where emp_id = #{emp_id}
+  		</update>
+  		
+  		<delete id="deleteEmployeeById" parameterType="int">
+  			delete from employee where emp_id = #{id}
+  		</delete>
+  		
+  		<insert id="insertEmployee" parameterType="cn.ttms.pojo.Employee">
+  			insert into employee
+  			<trim prefix="(" suffix=")" suffixOverrides=",">
+				emp_id,
+			<if test=" emp_no !=null and emp_no !=''">
+				emp_no,
+			</if>
+			<if test=" emp_name !=null and emp_name !=''">
+				emp_name,
+			</if>
+			<if test=" emp_tel_num !=null and emp_tel_num !=''">
+				emp_tel_num,
+			</if>
+			<if test=" emp_addr !=null and emp_addr !=''">
+				emp_addr,
+			</if>
+			<if test=" emp_email !=null and emp_email !=''">
+				emp_email,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+				null,
+			<if test=" emp_no !=null and emp_no !=''">
+				#{emp_no},
+			</if>
+			<if test=" emp_name !=null and emp_name !=''">
+				#{emp_name},
+			</if>
+			<if test=" emp_tel_num !=null and emp_tel_num !=''">
+				#{emp_tel_num},
+			</if>
+			<if test=" emp_addr !=null and emp_addr !=''">
+				#{emp_addr},
+			</if>
+			<if test=" emp_email !=null and emp_email !=''">
+				#{emp_email},
+			</if>
+		</trim>
+  		</insert>
+  </mapper>
